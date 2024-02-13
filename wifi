@@ -1,0 +1,69 @@
+#!/bin/sh 
+
+list() {
+    local rescan=""
+    for opt in $@; do
+        case $opt in
+            -r | --rescan) 
+                rescan="--rescan yes" 
+                ;;
+            *) 
+                echo "Error: \`${opt}' is an invalid option for list subcommand." >&2
+                exit 1
+                ;;
+        esac
+    done
+    nmcli --pretty device wifi list $rescan
+}
+
+connect() {
+    local name=$1
+    nmcli connection up id "$name" > /dev/null 2> /dev/null 
+    local exit_status="$?"
+    if [ ! "$exit_status" -eq 0 ]; then
+        nmcli --ask --pretty device wifi connect "$name"
+        exit_status="$?"
+    fi
+
+    if [ "$exit_status" -eq 0 ]; then
+        echo "Connection '${name}' successfully activated."
+    fi
+}
+
+down() {
+    local name="$1"
+    local INTERFACE="wlp3s0"
+    if [ -z "$name" ]; then 
+        name=$(nmcli -t -f NAME,DEVICE connection show --active | grep $INTERFACE | cut -d : -f 1)
+    fi
+    nmcli connection down id "$name" > /dev/null
+    if [ "$?" -eq 0 ]; then
+        echo "Connection '${name}' successfully deactivated."
+    fi
+}
+
+usage() {
+    echo "Usage: \`\$ wifi <subcmd>'"
+    echo "<subcmd> ::="
+    echo "           | help | --help | -h"
+    echo "           | list [--rescan or -r]"
+    echo "           | connect <name>"
+    echo "           | down [<name>]"
+    echo "           | config"
+    echo "           | off"
+    echo "           | on"
+}
+
+
+case $1 in
+       list) shift; list "$@" ;;
+    connect) shift; connect "$@" ;;
+       down) shift; down "$@" ;;
+     config) nm-connection-editor &> /dev/null &;;
+         on) nmcli radio wifi on ;;
+        off) nmcli radio wifi off ;;
+         help | --help | -h | "") usage ;;
+    *)
+        echo "Error: \`$1' is an invalid subcommand." >&2
+        exit 1
+esac
