@@ -2,7 +2,7 @@
 VERSION = 1.0
 
 # paths
-PREFIX = /usr/local/
+PREFIX = /usr/local
 
 all:
 	@echo wifi, version: ${VERSION}
