@@ -59,7 +59,7 @@ case $1 in
        list) shift; list "$@" ;;
     connect) shift; connect "$@" ;;
        down) shift; down "$@" ;;
-     config) nm-connection-editor &> /dev/null &;;
+     config) nm-connection-editor 1> /dev/null 2> /dev/null & ;;
          on) nmcli radio wifi on ;;
         off) nmcli radio wifi off ;;
          help | --help | -h | "") usage ;;
