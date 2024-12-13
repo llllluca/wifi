@@ -1,9 +1,8 @@
 Package: wifi
-Version: 1.0-1
+Version: 1.0
 Depends: network-manager
 Section: utils
 Priority: optional
 Architecture: all
 Maintainer: Luca <luca.orlandello@gmail.com>
 Description: Simple command line frontend for NetworkManager
-
