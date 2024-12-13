@@ -2,10 +2,10 @@
 
 set -ex
 
-VERSION=$(grep 'VERSION' Makefile | \
+VERSION=$(grep "VERSION" Makefile | \
     head -n 1 | awk '{ print $3 }')
-BIN=debian/bin
-DEBIAN=debian/DEBIAN
+BIN="debian/usr/local/bin"
+DEBIAN="debian/DEBIAN"
 
 mkdir -p ${BIN}
 mkdir -p ${DEBIAN}
