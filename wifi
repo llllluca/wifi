@@ -1,11 +1,11 @@
-#!/bin/sh 
+#!/bin/sh
 
 list() {
     local rescan=""
     for opt in $@; do
         case $opt in
-            -r | --rescan) 
-                rescan="--rescan yes" 
+            -r | --rescan)
+                rescan="--rescan yes"
                 ;;
             *) 
                 echo "Error: \`${opt}' is an invalid option for list subcommand." >&2
@@ -18,52 +18,58 @@ list() {
 
 connect() {
     local name=$1
-    # NetworkManager stores all network configuration as "connections", 
+    # NetworkManager stores all network configuration as "connections",
     # see `nmcli connection show' for a list of saved connections.
     # Try to active an already configured connection with name "$name",
     # return non zero on error (e.g. connection with name "$name" dosn't exist).
-    nmcli connection up id "$name" > /dev/null 2> /dev/null 
+    nmcli connection up id "$name"
     local exit_status="$?"
     if [ ! "$exit_status" -eq 0 ]; then
-        # Connect to a Wi-Fi network specified by SSID or BSSID 
+        # Connect to a Wi-Fi network specified by SSID or BSSID
         # and its configuration as a "connection".
         # See `nmcli device wifi list' for SSID or BSSID and
         # see `nmcli connection show' for configured connection.
         nmcli --ask --pretty device wifi connect "$name"
         exit_status="$?"
     fi
-
-    if [ "$exit_status" -eq 0 ]; then
-        echo "Connection '${name}' successfully activated."
-    fi
 }
 
 down() {
     local name="$1"
     local INTERFACE="wlp3s0"
-    if [ -z "$name" ]; then 
+    if [ -z "$name" ]; then
         # Find name of the connection active on "$INTERFACE"
         name=$(nmcli --terse --fields NAME,DEVICE connection show --active | \
             grep $INTERFACE | cut --delimiter : --fields 1)
     fi
-    nmcli connection down id "$name" > /dev/null
-    if [ "$?" -eq 0 ]; then
-        echo "Connection '${name}' successfully deactivated."
-    fi
+    nmcli connection down id "$name"
 }
+
+help_text="Usage: wifi <sub-command>
+Sub-command are:
+
+  help --help -h   Display this message
+
+  list [--rescan]  List wifi networks cached by NetworkManager.
+                   The --rescan flag force NetworkManager to
+                   search for new wifi networks
+
+  connect <name>   Connect to a wifi network
+
+  down [<name>]    Disconnect from a wifi network. If name is
+                   omitted disconnect from the wifi network active
+                   to the default wifi network interface
+
+  config           Open nm-connection-editor
+
+  off              Turn off wifi
+
+  on               Turn on wifi
+"
 
 usage() {
-    echo "Usage: \`\$ wifi <subcmd>'"
-    echo "<subcmd> ::="
-    echo "           | help | --help | -h"
-    echo "           | list [--rescan or -r]"
-    echo "           | connect <name>"
-    echo "           | down [<name>]"
-    echo "           | config"
-    echo "           | off"
-    echo "           | on"
+    printf "%s\n" "$help_text"
 }
-
 
 case $1 in
        list) shift; list "$@" ;;

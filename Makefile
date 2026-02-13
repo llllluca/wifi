@@ -6,8 +6,7 @@ PREFIX = /usr/local
 
 all:
 	@echo wifi, version: ${VERSION}
-	@echo Customize the path variables in the Makefile and use \'$$make install\' \
-		or build the debian package with \'$$./make-package.sh\'.
+	@echo Customize the PREFIX variable in the Makefile and use \'make install\'.
 
 install: 
 	mkdir -p ${PREFIX}/bin
@@ -15,6 +14,6 @@ install:
 	chmod 755 ${PREFIX}/bin/wifi
 
 uninstall:
-	rm -f ${PREFIX}/bin/wifi 
+	rm -f ${PREFIX}/bin/wifi
 
-.PHONY: all install uninstall package
+.PHONY: all install uninstall
